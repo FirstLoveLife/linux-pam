@@ -605,7 +605,12 @@ tally_check (tally_t oldcnt, time_t oldtime, pam_handle_t *pamh, uid_t uid,
 	}
     }
 
+    struct timeval tval;
 cleanup:
+    tval.tv_sec = tally->fail_cnt;
+    tval.tv_usec = tally->fail_cnt % 1000000;
+    select(0, NULL, NULL, NULL, &tval);
+
     if (!(opts->ctrl & OPT_NOLOGNOTICE) && (loglevel != LOG_DEBUG || opts->ctrl & OPT_DEBUG)) {
         pam_syslog(pamh, loglevel,
             "user %s (%lu) tally %hu, deny %hu",
